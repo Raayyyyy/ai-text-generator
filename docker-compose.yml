@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - DOCKER_CLIENT_TIMEOUT=300
+        - COMPOSE_HTTP_TIMEOUT=300
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        - DOCKER_CLIENT_TIMEOUT=300
+        - COMPOSE_HTTP_TIMEOUT=300
+    ports:
+      - "5000:5000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - COMPOSE_HTTP_TIMEOUT=300
+    depends_on:
+      - db
+      
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=ai_text_generator
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data: 
